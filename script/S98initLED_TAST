@@ -4,7 +4,7 @@
 TAST_GPIO=17
 
 echo "$TAST_GPIO" > /sys/class/gpio/export
-echo "in" > sys/class/gpio/gpio$TAST_GPIO/direction
+echo "in" > /sys/class/gpio/gpio$TAST_GPIO/direction
 
 #LED
 LED_GPIO=18
