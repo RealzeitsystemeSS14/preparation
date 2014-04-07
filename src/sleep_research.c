@@ -17,6 +17,7 @@ int fd = -1;
 int sleep_usec = -1, min_usec = -1, max_usec = -1, step_usec = -1, loop_count = -1;
 char out_file[500];
 int realtime = 0;
+int verbose = 0;
 struct sched_param schedParam;
 
 void set_sleep_time(int p_usec, struct timespec* p_timespec);
@@ -49,9 +50,12 @@ int main(int argc, char **argv)
 		
 		max_delay = 0;
 		set_sleep_time(sleep_usec, &sleep_time);
-	
-		printf("starting meassurement: sleep time = %d usec, loops = %d\n", sleep_usec, loop_count);
-		printf("============================\n");
+		
+		if(verbose)
+		{
+			printf("starting meassurement: sleep time = %d usec, loops = %d\n", sleep_usec, loop_count);
+			printf("============================\n");
+		}
 		
 		for(i = 0; i < loop_count; ++i)
 		{
@@ -72,10 +76,13 @@ int main(int argc, char **argv)
 			if(delay > max_delay)
 				max_delay = delay;
 			
-			printf("value: %ld usec, delay: %d usec, raw_data: %.6f usec\n",
-				   (long) meassured_time,
-				   delay,
-				   meassured_time);
+			if(verbose)
+			{
+				printf("value: %ld usec, delay: %d usec, raw_data: %.6f usec\n",
+						(long) meassured_time,
+						delay,
+						meassured_time);
+			}
 		}
 		
 		printf("============================\n");
@@ -90,13 +97,13 @@ int main(int argc, char **argv)
 
 void set_sleep_time(int p_usec, struct timespec* p_timespec)
 {
-	p_timespec->tv_sec = p_usec / 1000000;
-	p_timespec->tv_nsec = (p_usec % 1000000) * 1000;
+	p_timespec->tv_sec = p_usec / 1000000.0;
+	p_timespec->tv_nsec = ((double)(p_usec % 1000000)) * 1000.0;
 }
 
 double get_time_diff(struct timespec* const begin, struct timespec* const end)
 {
-	return (double) (end->tv_sec - begin->tv_sec) * 1000000 + (double) (end->tv_nsec - begin->tv_nsec) / 1000;
+	return ((double)(end->tv_sec - begin->tv_sec)) * 1000000.0 + ((double) (end->tv_nsec - begin->tv_nsec)) / 1000.0;
 }
 
 int parse_args(int argc, char **argv)
@@ -138,6 +145,10 @@ int parse_args(int argc, char **argv)
 				break;
 			case 'f':
 				realtime = 1;
+				break;
+			case 'v':
+				verbose = 1;
+				break;
 			default:
 				break;
 		}
