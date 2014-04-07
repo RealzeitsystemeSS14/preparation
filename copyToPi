@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TARGET="pi10"
+USER="root"
+PW="raspbian"
+
+TARGET_PATH="/$USER/uploads"
+
+sshpass -p $PW scp bin/* script/* $USER@$TARGET:$TARGET_PATH
