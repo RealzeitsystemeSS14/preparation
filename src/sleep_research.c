@@ -7,13 +7,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sched.h>
 
 #define STR_SIZE 100
+#define RT_PRIORITY 99
 
 int fd = -1;
 
 int sleep_usec = -1, min_usec = -1, max_usec = -1, step_usec = -1, loop_count = -1;
 char out_file[500];
+int realtime = 0;
+struct sched_param schedParam;
 
 void set_sleep_time(int p_usec, struct timespec* p_timespec);
 double get_time_diff(struct timespec* const begin, struct timespec* const end);
@@ -22,6 +26,7 @@ int check_args();
 void openFile(char *file_name);
 void closeFile();
 int writeToFile(char *file_name, int period, int delay);
+void setRealtimePrio();
 
 int main(int argc, char **argv)
 {
@@ -37,6 +42,8 @@ int main(int argc, char **argv)
 	
 	if(check_args())
 		return -1;
+	if(realtime)
+		setRealtimePrio();
 	
 	for(sleep_usec = min_usec; sleep_usec <= max_usec; sleep_usec += step_usec) {
 		
@@ -101,7 +108,8 @@ int parse_args(int argc, char **argv)
 		{"max", required_argument, 0, 'b'},
 		{"loop", required_argument, 0, 'c'},
 		{"step", required_argument, 0, 'd'},
-		{"out", required_argument, 0, 'e'}
+		{"out", required_argument, 0, 'e'},
+		{"rt", no_argument, 0, 'f'}
 		};
 	int idx;
 	
@@ -128,6 +136,8 @@ int parse_args(int argc, char **argv)
 			case 'e':
 				strcpy(out_file, optarg);
 				break;
+			case 'f':
+				realtime = 1;
 			default:
 				break;
 		}
@@ -201,4 +211,11 @@ int writeToFile(char *file_name, int period, int delay)
 	}
 	
 	return 0;
+}
+
+void setRealtimePrio()
+{
+	schedParam.sched_priority = RT_PRIORITY;
+	if(sched_setscheduler(0, SCHED_RR, &schedParam) == -1)
+		perror("Could not set RT_prio");
 }
