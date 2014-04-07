@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm LOG
+./sleep_research -rt -min 0 -max 20000 -step 500 -out LOG -loop 100
+gnuplot plot

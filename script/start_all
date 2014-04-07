@@ -1,0 +1,7 @@
+#!/bin/bash
+
+./start
+./start_rt
+
+./start_heavyLoad
+./start_heavyLoad_rt
