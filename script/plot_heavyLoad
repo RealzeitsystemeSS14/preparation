@@ -1,0 +1,10 @@
+set title "{/=20 Nanosleep delays on Linux Kernel}"
+set terminal postscript eps enhanced
+set xlabel "{/=20Period to sleep [microseconds]}\n"
+set ylabel "{/=20Measured delay [microseconds]}"
+set output 'result_heavyLoad.eps'
+set grid
+set autoscale
+set style data lines
+show style data
+ plot 'LOG' using ($1):($2) title "{/=17 Heavy Load no RT: Linux}" lw 6
