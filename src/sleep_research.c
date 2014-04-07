@@ -105,8 +105,12 @@ int parse_args(int argc, char **argv)
 		};
 	int idx;
 	
-	while((c = getopt_long_only(argc, argv, "", long_opts, &idx)) != -1)
+	while(1)
 	{
+		c = getopt_long_only(argc, argv, "", long_opts, &idx);
+
+		if(c < 0 || c == 255)
+			break;
 		switch(c)
 		{
 			case 'a':

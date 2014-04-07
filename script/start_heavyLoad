@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm LOG
+./doSomeWork &
+./sleep_research -min 0 -max 20000 -step 500 -out LOG -loop 100
+gnuplot plot_heavyLoad
