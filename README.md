@@ -2,7 +2,7 @@
 
 ## Installation
 
-* raspbian wie [hier] [http://www.raspberrypi.org/forums/viewtopic.php?f=66&t=50310] beschrieben installieren
+* raspbian wie [hier] (http://www.raspberrypi.org/forums/viewtopic.php?f=66&t=50310) beschrieben installieren
 * dann folgende Programme auf dem RPI installieren
 
 ```
