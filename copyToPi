@@ -3,9 +3,9 @@
 # Enter here correct pi address and user
 
 #TARGET="pi10"
-TARGET_PATH="/$USER/uploads"
 TARGET=141.37.31.104
 USER="root"
 PW="raspbian"
+TARGET_PATH="/$USER/uploads"
 
 sshpass -p $PW scp bin/* script/* $USER@$TARGET:$TARGET_PATH

@@ -14,6 +14,11 @@
 #define MICROSECONDS_PER_SECOND 1000000
 #define RT_PRIORITY 99
 
+typedef struct time_measure {
+	int sleep_usec;
+	int max_delay;
+} time_measure;
+
 // Prototypes
 void set_sleep_time(int p_usec, struct timespec* p_timespec);
 void setRealtimePrio();
@@ -38,7 +43,15 @@ int doMeasurement()
 	struct timespec sleep_time, remain_time;
 	struct timeval begin, end;
 	int diff_time, delay, max_delay;
-	int i;
+	int i, j = 0, data_length;
+	time_measure *data;
+	
+	data_length = ((max_usec - min_usec) / step_usec) + 1;
+	data = malloc(sizeof(time_measure) * 10000);
+	if (data == NULL) {
+		perror("Error allocating memory.");
+		return -1;
+	}
 
 	for (sleep_usec = min_usec; sleep_usec <= max_usec; sleep_usec += step_usec) {
 
@@ -71,7 +84,7 @@ int doMeasurement()
 				max_delay = delay;
 
 			if (verbose) {
-				// TODO: Nanoseconds
+				// TODO: Maybe nanoseconds
 				printf("value: %d usec, delay: %d usec, raw_data: %d usec\n",
 				       diff_time, delay, diff_time);
 			}
@@ -82,7 +95,16 @@ int doMeasurement()
 			printf("Max delay = %d usec\n", max_delay);
 			printf("============================\n");
 		}
+		
+		data[j].sleep_usec = sleep_usec;
+		data[j].max_delay = max_delay;
+		++j;
 	}
+	
+	for (i = 0; i < data_length; ++i)
+		writeToFile(out_file, data[i].sleep_usec, data[i].max_delay);
+	
+	free(data);
 	
 	return 0;
 }
