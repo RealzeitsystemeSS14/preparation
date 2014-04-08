@@ -1,7 +1,17 @@
 #!/bin/bash
 
+./led5 &
+sleep 3
+killall led5
+
 ./start
 ./start_rt
 
 ./start_heavyLoad
+killall doSomeWork
 ./start_heavyLoad_rt
+killall doSomeWork
+
+./led5 &
+sleep 20
+killall led5

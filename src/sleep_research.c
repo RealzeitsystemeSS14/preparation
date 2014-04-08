@@ -12,6 +12,11 @@
 #define STR_SIZE 100
 #define RT_PRIORITY 99
 
+typedef struct {
+	double time;
+	int period;
+} time_measure;
+
 int fd = -1;
 
 int sleep_usec = -1, min_usec = -1, max_usec = -1, step_usec = -1, loop_count = -1;
@@ -32,8 +37,10 @@ void setRealtimePrio();
 int main(int argc, char **argv)
 {
 	struct timespec sleep_time, remain_time, begin, end;
-	int ret, i, delay, max_delay;
-	double meassured_time;
+	int ret, i, k, delay, max_delay, array_len;
+	time_measure* time_delay;
+	double measured_time;
+	
 	
 	if(parse_args(argc, argv))
 	{
@@ -43,9 +50,13 @@ int main(int argc, char **argv)
 	
 	if(check_args())
 		return -1;
+		
+	array_len = (max_usec - min_usec) / step_usec;
+	time_delay = (time_measure*) malloc( array_len * sizeof(time_measure));
 	if(realtime)
 		setRealtimePrio();
 	
+	k = 0;
 	for(sleep_usec = min_usec; sleep_usec <= max_usec; sleep_usec += step_usec) {
 		
 		max_delay = 0;
@@ -70,27 +81,37 @@ int main(int argc, char **argv)
 			
 			clock_gettime(CLOCK_MONOTONIC, &end);
 			
-			meassured_time = get_time_diff(&begin, &end);
+			measured_time = get_time_diff(&begin, &end);
 			
-			delay = abs((int) (meassured_time - sleep_usec));
+			delay = abs((int) (measured_time - sleep_usec));
 			if(delay > max_delay)
 				max_delay = delay;
 			
 			if(verbose)
 			{
 				printf("value: %ld usec, delay: %d usec, raw_data: %.6f usec\n",
-						(long) meassured_time,
+						(long) measured_time,
 						delay,
-						meassured_time);
+						measured_time);
 			}
 		}
+		if(verbose)
+		{
+			printf("============================\n");
+			printf("Max delay = %d usec\n", max_delay);
+			printf("============================\n");
+		}
 		
-		printf("============================\n");
-		printf("Max delay = %d usec\n", max_delay);
-		printf("============================\n");
+		time_delay[k].time = max_delay;
+		time_delay[k].period = sleep_usec;
+		++k;
 		
-		writeToFile(out_file, sleep_usec, max_delay);
 	}
+	
+	for(i = 0; i < array_len; ++i)
+		writeToFile(out_file, time_delay[i].period, time_delay[i].time);
+	
+	free(time_delay);
 	
 	return 0;
 }
@@ -98,7 +119,7 @@ int main(int argc, char **argv)
 void set_sleep_time(int p_usec, struct timespec* p_timespec)
 {
 	p_timespec->tv_sec = p_usec / 1000000.0;
-	p_timespec->tv_nsec = ((double)(p_usec % 1000000)) * 1000.0;
+	p_timespec->tv_nsec = (p_usec % 1000000.0) * 1000.0;
 }
 
 double get_time_diff(struct timespec* const begin, struct timespec* const end)
@@ -117,7 +138,7 @@ int parse_args(int argc, char **argv)
 		{"step", required_argument, 0, 'd'},
 		{"out", required_argument, 0, 'e'},
 		{"rt", no_argument, 0, 'f'}
-		};
+	};
 	int idx;
 	
 	while(1)
