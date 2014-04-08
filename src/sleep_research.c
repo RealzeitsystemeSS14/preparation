@@ -202,9 +202,9 @@ void set_sleep_time(int p_usec, struct timespec* p_timespec)
 
 void setRealtimePrio()
 {
-	scheduler_options.sched_priority = sched_get_priority_max(SCHED_RR);
+	scheduler_options.sched_priority = sched_get_priority_max(SCHED_FIFO);
 
-	if (sched_setscheduler(0, SCHED_RR, &scheduler_options) == -1)
+	if (sched_setscheduler(0, SCHED_FIFO, &scheduler_options) == -1)
 		perror("Could not set RT_prio");
 }
 
