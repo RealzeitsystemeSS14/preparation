@@ -12,6 +12,7 @@
 #include <sys/time.h>
 
 #define MICROSECONDS_PER_SECOND 1000000
+#define NANOSECONDS_PER_SECOND 1000000000
 #define RT_PRIORITY 99
 
 typedef struct time_measure {
@@ -25,7 +26,9 @@ void setRealtimePrio();
 int parse_args(int argc, char **argv);
 int check_args();
 struct timeval get_time_diff(struct timeval *begin, struct timeval *end);
+struct timespec get_time_diff_precise(struct timespec *begin, struct timespec *end);
 int get_time_diff_usec(struct timeval *begin, struct timeval *end);
+double get_time_diff_usec_precise(struct timespec *begin, struct timespec *end);
 
 // Options (getopt)
 int sleep_usec = -1, min_usec = -1, max_usec = -1, step_usec = -1, loop_count = -1;
@@ -41,11 +44,13 @@ struct sched_param scheduler_options;
 int doMeasurement()
 {
 	struct timespec sleep_time, remain_time;
-	struct timeval begin, end;
+	//struct timeval begin, end;
+	struct timespec begin, end;
 	int diff_time, delay, max_delay;
 	int i, j = 0, data_length;
 	time_measure *data;
-	
+	double diff_time_precise;
+
 	data_length = ((max_usec - min_usec) / step_usec) + 1;
 	data = malloc(sizeof(time_measure) * 10000);
 	if (data == NULL) {
@@ -68,7 +73,8 @@ int doMeasurement()
 		for (i = 0; i < loop_count; ++i) {
 			int ret;
 
-			gettimeofday(&begin, NULL);
+			//!!gettimeofday(&begin, NULL);
+			clock_gettime(CLOCK_MONOTONIC, &begin);
 
 			ret = clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_time, &remain_time);
 			if (ret) {
@@ -76,17 +82,22 @@ int doMeasurement()
 				return -1;
 			}
 
-			gettimeofday(&end, NULL);
+			//!!gettimeofday(&end, NULL);
+			clock_gettime(CLOCK_MONOTONIC, &end);
 
-			diff_time = get_time_diff_usec(&begin, &end);
-			delay = abs(diff_time - sleep_usec);
+			diff_time_precise = get_time_diff_usec_precise(&begin, &end);
+			//!!diff_time = get_time_diff_usec(&begin, &end);
+			//!!!delay = abs(diff_time - sleep_usec);
+			delay = abs((int) diff_time_precise - sleep_usec);
 			if (delay > max_delay)
 				max_delay = delay;
 
 			if (verbose) {
-				// TODO: Maybe nanoseconds
-				printf("value: %d usec, delay: %d usec, raw_data: %d usec\n",
-				       diff_time, delay, diff_time);
+				//!!printf("value: %d usec, delay: %d usec, raw_data: %d usec\n",
+				//!!   diff_time, delay, diff_time);
+
+				printf("value: %d usec, delay: %d usec, raw_data: %f usec\n",
+				       (int) diff_time_precise, delay, diff_time_precise);
 			}
 		}
 
@@ -95,41 +106,67 @@ int doMeasurement()
 			printf("Max delay = %d usec\n", max_delay);
 			printf("============================\n");
 		}
-		
+
 		data[j].sleep_usec = sleep_usec;
 		data[j].max_delay = max_delay;
 		++j;
 	}
-	
+
 	for (i = 0; i < data_length; ++i)
 		writeToFile(out_file, data[i].sleep_usec, data[i].max_delay);
-	
+
 	free(data);
-	
+
 	return 0;
 }
 
+/*
+ * Time conversion functions.
+ */
 int get_time_diff_usec(struct timeval *begin, struct timeval *end)
 {
 	int time_in_usec = ((end->tv_sec * 1000000) + end->tv_usec) -
-		((begin->tv_sec * 1000000) + begin->tv_usec);
-	
+	                   ((begin->tv_sec * 1000000) + begin->tv_usec);
+
 	return time_in_usec;
 }
 
 struct timeval get_time_diff(struct timeval *begin, struct timeval *end)
 {
 	struct timeval tmp;
-	
+
 	tmp.tv_sec = end->tv_sec - begin->tv_sec;
-	tmp.tv_usec= end->tv_usec - begin->tv_usec;
- 
-    if (tmp.tv_usec < 0) {
-        tmp.tv_sec--;
-        tmp.tv_usec = MICROSECONDS_PER_SECOND + tmp.tv_usec;
-    }
-	
-    return tmp;
+	tmp.tv_usec = end->tv_usec - begin->tv_usec;
+
+	if (tmp.tv_usec < 0) {
+		tmp.tv_sec--;
+		tmp.tv_usec = MICROSECONDS_PER_SECOND + tmp.tv_usec;
+	}
+
+	return tmp;
+}
+
+double get_time_diff_usec_precise(struct timespec *begin, struct timespec *end)
+{
+	double end_usec = (end->tv_sec * 1000000.0) + (end->tv_nsec / 1000.0);
+	double start_usec = (begin->tv_sec * 1000000.0) + (begin->tv_nsec / 1000.0);
+
+	return end_usec - start_usec;
+}
+
+struct timespec get_time_diff_precise(struct timespec *begin, struct timespec *end)
+{
+	struct timespec tmp;
+
+	tmp.tv_sec = end->tv_sec - begin->tv_sec;
+	tmp.tv_nsec = end->tv_nsec - begin->tv_nsec;
+
+	if (tmp.tv_nsec < 0) {
+		tmp.tv_sec--;
+		tmp.tv_nsec = NANOSECONDS_PER_SECOND + tmp.tv_nsec;
+	}
+
+	return tmp;
 }
 
 /*
