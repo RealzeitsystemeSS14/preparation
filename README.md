@@ -57,5 +57,8 @@ make
 ## Interpretation
 
 Die Diagramme zeigen die maximale Abweichung zwischen der eingestellten und der gemessenen Zeit (y-Achse) und die eingestellte Sollschlafzeit (x-Achse).
+
 Zu sehen ist, dass der Prozess selbst unter Last eine konstante und geringe Abweichung hat, wenn er mit RT-Priorität betrieben wird. Ohne RT-Priorität gibt es immer wieder größere Abweichungen vorallem im Betrieb mit viel Systemlast.
+
+Der Prozess wird mit RT-Priorität im System also deutlich bevorzugt!
 
