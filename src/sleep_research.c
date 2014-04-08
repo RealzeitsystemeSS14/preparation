@@ -13,7 +13,7 @@
 
 #define MICROSECONDS_PER_SECOND 1000000
 #define NANOSECONDS_PER_SECOND 1000000000
-#define RT_PRIORITY 99 // Unused
+#define RT_PRIORITY 99
 
 typedef struct time_measure {
 	int sleep_usec;
@@ -46,10 +46,11 @@ int doMeasurement()
 	struct timespec sleep_time, remain_time;
 	//struct timeval begin, end;
 	struct timespec begin, end;
-	int diff_time, delay, max_delay;
+	int delay, max_delay;
 	int i, j = 0, data_length;
 	time_measure *data;
 	double diff_time_precise;
+	//!!int diff_time;
 
 	data_length = ((max_usec - min_usec) / step_usec) + 1;
 	data = malloc(sizeof(time_measure) * 10000);
@@ -202,9 +203,9 @@ void set_sleep_time(int p_usec, struct timespec* p_timespec)
 
 void setRealtimePrio()
 {
-	scheduler_options.sched_priority = sched_get_priority_max(SCHED_FIFO);
+	scheduler_options.sched_priority = RT_PRIORITY;//sched_get_priority_max(SCHED_RR);
 
-	if (sched_setscheduler(0, SCHED_FIFO, &scheduler_options) == -1)
+	if (sched_setscheduler(0, SCHED_RR, &scheduler_options) == -1)
 		perror("Could not set RT_prio");
 }
 
