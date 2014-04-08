@@ -48,8 +48,8 @@ make
 * die Programme können wie in der Aufgabenstellung vorgesehen benutzt werden
 * das Skript __start_all__ startet die SleepMessung in verschiedenen Varianten (mit/ohne RT-Prio; mit / ohne Heavy Load)
 * dabei werden die __gnuplot files__ mit unterschiedlichen Namen gespeichert:
-  * result.eps = ohne Load + ohne RT-Prio
-  * result_rt.eps = ohne Load + mit RT-Prio
-  * result_heavyLoad.eps = mit Load + ohne RT-Prio
-  * result_heavyLoad_rt.eps = mit Load + mit RT-Prio
+  * __result.eps__ = ohne Load + ohne RT-Prio
+  * __result_rt.eps__ = ohne Load + mit RT-Prio
+  * __result_heavyLoad.eps__ = mit Load + ohne RT-Prio
+  * __result_heavyLoad_rt.eps__ = mit Load + mit RT-Prio
 * die Programme __switch__ und __led5__ benötigen denselben Aufbau aus der Aufgabenstellung (gleiche GPIO-Pins)
