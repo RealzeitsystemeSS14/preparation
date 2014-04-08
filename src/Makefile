@@ -1,6 +1,6 @@
 CROSS_COMPILE=/opt/toolchains/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
-#CC=$(CROSS_COMPILE)gcc
-CC=gcc
+CC=$(CROSS_COMPILE)gcc
+#CC=gcc
 CFLAGS=-Wall -g
 
 BIN_DIR=../bin
