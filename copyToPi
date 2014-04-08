@@ -1,6 +1,7 @@
 #!/bin/bash
 
-TARGET="pi10"
+#TARGET="pi10"
+TARGET=141.37.31.104
 USER="root"
 PW="raspbian"
 

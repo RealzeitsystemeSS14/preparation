@@ -124,7 +124,21 @@ void set_sleep_time(int p_usec, struct timespec* p_timespec)
 
 double get_time_diff(struct timespec* const begin, struct timespec* const end)
 {
-	return (double) ((end->tv_sec - begin->tv_sec) * 1000000 + (end->tv_nsec - begin->tv_nsec) / 1000);
+	struct timespec tmp;
+	double result;
+	if((end->tv_nsec - begin->tv_nsec) < 0)
+	{
+		tmp.tv_sec = end->tv_sec - begin->tv_sec - 1;
+		tmp.tv_nsec = 1000000000 + end->tv_nsec - begin->tv_nsec;
+	}
+	else
+	{
+		tmp.tv_sec = end->tv_sec - begin->tv_sec;
+		tmp.tv_nsec = end->tv_nsec - begin->tv_nsec;
+	}
+	
+	result = tmp.tv_sec * 1000000 + tmp.tv_nsec / 1000;
+	return result;
 }
 
 int parse_args(int argc, char **argv)
