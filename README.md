@@ -53,3 +53,9 @@ make
   * __result_heavyLoad.eps__ = mit Load + ohne RT-Prio
   * __result_heavyLoad_rt.eps__ = mit Load + mit RT-Prio
 * die Programme __switch__ und __led5__ benötigen denselben Aufbau aus der Aufgabenstellung (gleiche GPIO-Pins)
+
+## Interpretation
+
+Die Diagramme zeigen die Maximale Abweichung zwischen der eingestellten und der gemessenen Zeit (y-Achse) und die eingestellte Sollschlafzeit (x-Achse).
+Zu sehen ist, dass der Prozess selbst unter Last eine konstante und geringe Abweichung hat, wenn er mit RT-Priorität betrieben wird. Ohne RT-Priorität gibt es immer wieder größere Abweichungen vorallem im Betrieb mit viel Systemlast.
+
