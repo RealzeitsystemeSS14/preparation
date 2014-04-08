@@ -13,7 +13,7 @@
 
 #define MICROSECONDS_PER_SECOND 1000000
 #define NANOSECONDS_PER_SECOND 1000000000
-#define RT_PRIORITY 99
+#define RT_PRIORITY 99 // Unused
 
 typedef struct time_measure {
 	int sleep_usec;
@@ -202,7 +202,7 @@ void set_sleep_time(int p_usec, struct timespec* p_timespec)
 
 void setRealtimePrio()
 {
-	scheduler_options.sched_priority = RT_PRIORITY;
+	scheduler_options.sched_priority = sched_get_priority_max(SCHED_RR);
 
 	if (sched_setscheduler(0, SCHED_RR, &scheduler_options) == -1)
 		perror("Could not set RT_prio");
