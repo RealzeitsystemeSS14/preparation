@@ -118,13 +118,13 @@ int main(int argc, char **argv)
 
 void set_sleep_time(int p_usec, struct timespec* p_timespec)
 {
-	p_timespec->tv_sec = p_usec / 1000000.0;
-	p_timespec->tv_nsec = (p_usec % 1000000.0) * 1000.0;
+	p_timespec->tv_sec = p_usec / 1000000;
+	p_timespec->tv_nsec = (p_usec % 1000000) * 1000;
 }
 
 double get_time_diff(struct timespec* const begin, struct timespec* const end)
 {
-	return ((double)(end->tv_sec - begin->tv_sec)) * 1000000.0 + ((double) (end->tv_nsec - begin->tv_nsec)) / 1000.0;
+	return (double) ((end->tv_sec - begin->tv_sec) * 1000000 + (end->tv_nsec - begin->tv_nsec) / 1000);
 }
 
 int parse_args(int argc, char **argv)
